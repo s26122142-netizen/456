@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER PORTFOLIO // 網頁作品集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-cyan: #00f3ff;
+            --neon-yellow: #ffee00;
+            --neon-purple: #9d00ff;
+            --bg-dark: #09090e;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Noto Sans TC', 'Orbitron', sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 0, 127, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 243, 255, 0.15) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+        }
+
+        /* 復古 CRT 掃描線效果 */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 99;
+            opacity: 0.6;
+        }
+
+        /* 毛玻璃極致質感卡片 */
+        .glass-card {
+            background: rgba(20, 20, 35, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* 已解鎖關卡 - Y2K 霓虹風格 */
+        .unlocked-card {
+            background: rgba(26, 20, 48, 0.55);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            position: relative;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .unlocked-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 243, 255, 0.25),
+                rgba(255, 0, 127, 0.25),
+                transparent
+            );
+            transition: 0.6s;
+        }
+
+        .unlocked-card:hover::before {
+            left: 100%;
+        }
+
+        .unlocked-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--neon-cyan);
+            box-shadow: 
+                0 0 20px rgba(0, 243, 255, 0.4),
+                inset 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        /* 第一個卡片強調色 (Pink Y2K) */
+        .card-pink:hover {
+            border-color: var(--neon-pink) !important;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 127, 0.5),
+                inset 0 0 15px rgba(255, 0, 127, 0.2) !important;
+        }
+
+        /* 未解鎖關卡 - 灰色封印質感 */
+        .locked-card {
+            background: rgba(15, 15, 22, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: not-allowed;
+            filter: grayscale(80%);
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .locked-card:hover {
+            opacity: 0.8;
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: scale(0.99);
+        }
+
+        /* 賽博龐克切角徽章 */
+        .cyber-tag {
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+        }
+
+        /* Glitch 文字動畫效果 */
+        .glitch-text {
+            position: relative;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* 賽博網格頭像邊框 */
+        .avatar-container {
+            position: relative;
+            padding: 5px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan), var(--neon-yellow));
+            background-size: 200% 200%;
+            animation: gradientRotate 4s ease infinite;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
+        }
+
+        @keyframes gradientRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 像素風格標籤 */
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4 sm:px-8 relative flex flex-col items-center justify-between">
+
+    <!-- 掃描線光照層 -->
+    <div class="scanlines"></div>
+
+    <!-- 主要內容區 -->
+    <main class="w-full max-w-6xl mx-auto z-10 flex flex-col items-center">
+        
+        <!-- 大頭貼與個人資訊欄 -->
+        <header class="flex flex-col items-center text-center mb-12">
+            <!-- 頭像外框與圖片 -->
+            <div class="avatar-container mb-4">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-black bg-gray-900">
+                    <!-- 預設假圖大頭貼 -->
+                    <img 
+                        src="https://placehold.co/300x300/101428/00f3ff?text=CYBER+ME" 
+                        alt="User Profile Avatar" 
+                        class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&auto=format&fit=crop&q=80'"
+                    >
+                </div>
+            </div>
+
+            <!-- 名字與標語 -->
+            <h1 class="text-3xl sm:text-5xl font-black tracking-wider glitch-text mb-2 text-white">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-500 to-yellow-300">ALEX.DEV</span>
+            </h1>
+            <div class="flex items-center gap-2 text-xs sm:text-sm font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-4 py-1.5 rounded-full backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Y2K CODE QUEST // 網頁作品集入口</span>
+            </div>
+        </header>
+
+        <!-- 16 個按鈕關卡網格 -->
+        <section class="w-full">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                
+                <!-- 按鈕 1：已解鎖 (Week 1) -->
+                <a href="w1/index.html" class="unlocked-card card-pink glass-card rounded-2xl p-5 flex flex-col justify-between h-44 group">
+                    <div class="flex justify-between items-start">
+                        <span class="cyber-tag bg-pink-600 text-white text-[10px] pixel-font px-2.5 py-1 rounded-sm uppercase tracking-widest font-bold">
+                            STAGE 01
+                        </span>
+                        <span class="text-xs font-mono text-pink-400 bg-pink-950/80 px-2 py-0.5 rounded border border-pink-500/40">
+                            UNLOCKED
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white group-hover:text-pink-300 transition-colors flex items-center gap-2">
+                            <span>Week 1</span>
+                            <span class="text-pink-500 text-xs">►</span>
+                        </h2>
+                        <p class="text-sm text-gray-300 font-medium mt-1">數位名片</p>
+                    </div>
+                    <div class="w-full bg-pink-950/40 h-1.5 rounded-full overflow-hidden border border-pink-500/30">
+                        <div class="bg-gradient-to-r from-pink-500 to-yellow-400 h-full w-full"></div>
+                    </div>
+                </a>
+
+                <!-- 按鈕 2：已解鎖 (Week 2) -->
+                <a href="w2/index.html" class="unlocked-card glass-card rounded-2xl p-5 flex flex-col justify-between h-44 group">
+                    <div class="flex justify-between items-start">
+                        <span class="cyber-tag bg-cyan-600 text-white text-[10px] pixel-font px-2.5 py-1 rounded-sm uppercase tracking-widest font-bold">
+                            STAGE 02
+                        </span>
+                        <span class="text-xs font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/40">
+                            UNLOCKED
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center gap-2">
+                            <span>Week 2</span>
+                            <span class="text-cyan-400 text-xs">►</span>
+                        </h2>
+                        <p class="text-sm text-gray-300 font-medium mt-1">今天吃甚麼?</p>
+                    </div>
+                    <div class="w-full bg-cyan-950/40 h-1.5 rounded-full overflow-hidden border border-cyan-500/30">
+                        <div class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full w-full"></div>
+                    </div>
+                </a>
+
+                <!-- 按鈕 3 ~ 16：未解鎖狀態 (迴圈生成 14 個) -->
+                <script>
+                    // 動態產生剩餘的 14 個未解鎖按鈕
+                    const stageTitles = [
+                        "尚未解鎖", "尚未解鎖", "尚未解鎖", "尚未解鎖",
+                        "尚未解鎖", "尚未解鎖", "尚未解鎖", "尚未解鎖",
+                        "尚未解鎖", "尚未解鎖", "尚未解鎖", "尚未解鎖",
+                        "尚未解鎖", "期末專題"
+                    ];
+
+                    for (let i = 3; i <= 16; i++) {
+                        const stageNum = i < 10 ? `0${i}` : `${i}`;
+                        const title = stageTitles[i - 3] || "尚未解鎖";
+                        
+                        document.write(`
+                            <div class="locked-card glass-card rounded-2xl p-5 flex flex-col justify-between h-44 select-none relative overflow-hidden">
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-gray-800/80 text-gray-400 text-[10px] pixel-font px-2.5 py-1 rounded-sm border border-gray-700">
+                                        STAGE ${stageNum}
+                                    </span>
+                                    <span class="text-xs font-mono text-gray-500 bg-gray-900/80 px-2 py-0.5 rounded border border-gray-800 flex items-center gap-1">
+                                        🔒 LOCKED
+                                    </span>
+                                </div>
+                                <div>
+                                    <h2 class="text-base font-bold text-gray-400 flex items-center gap-2">
+                                        <span>Week ${i}</span>
+                                    </h2>
+                                    <p class="text-sm text-gray-500 font-normal mt-1 flex items-center gap-1">
+                                        <span>${title}</span>
+                                    </p>
+                                </div>
+                                <div class="w-full bg-gray-900 h-1.5 rounded-full overflow-hidden border border-gray-800">
+                                    <div class="bg-gray-700 h-full w-0"></div>
+                                </div>
+                                <!-- 浮水印鎖頭 -->
+                                <span class="absolute -right-2 -bottom-2 text-6xl opacity-10 pointer-events-none">🔒</span>
+                            </div>
+                        `);
+                    }
+                </script>
+
+            </div>
