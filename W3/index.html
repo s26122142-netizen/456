@@ -1,0 +1,445 @@
+!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" <content="width=device-width, initial-scale=1.0">
+    <title>80s 復古迷因產生器 - Retro Meme Factory</title>
+    
+    <!-- 引入 Tailwind CSS 快速建立基礎響應式框架 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 復古圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 Google Fonts：Press Start 2P (像素風), VT323 (復古終端機), Anton (經典迷因粗體) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <!-- 引入 html2canvas 畫布截圖下載工具 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* 定義字型類別 */
+        .font-pixel { font-family: 'Press Start 2P', cursive; }
+        .font-vt { font-family: 'VT323', monospace; }
+        .font-meme { font-family: 'Anton', 'Impact', sans-serif; letter-spacing: 1px; }
+
+        /* 復古背景：漸層與動態網格線 */
+        body {
+            background-color: #0d0221;
+            background-image: 
+                linear-gradient(rgba(255, 0, 128, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #00f0ff;
+            font-family: 'VT323', monospace;
+        }
+
+        /* 8-bit / 復古霓虹邊框與陰影 */
+        .retro-box {
+            background: #190a38;
+            border: 4px solid #ff007f;
+            box-shadow: 6px 6px 0px #00f0ff, -2px -2px 0px #ffe600;
+        }
+
+        .retro-input {
+            background: #0d0221;
+            border: 2px solid #00f0ff;
+            color: #ffe600;
+            font-family: 'VT323', monospace;
+            font-size: 1.25rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .retro-input:focus {
+            border-color: #ff007f;
+            box-shadow: 0 0 10px #ff007f;
+        }
+
+        /* 復古按鈕樣式 */
+        .retro-btn {
+            background: #ff007f;
+            color: #ffffff;
+            font-family: 'Press Start 2P', cursive;
+            border: 3px solid #ffe600;
+            box-shadow: 4px 4px 0px #00f0ff;
+            transition: all 0.1s ease-in-out;
+        }
+        .retro-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #00f0ff;
+            background: #ff1a8c;
+        }
+        .retro-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #00f0ff;
+        }
+
+        /* 滑桿客製化樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: #0d0221;
+            border: 1px solid #00f0ff;
+            height: 10px;
+            border-radius: 0px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 14px;
+            background: #ffe600;
+            border: 2px solid #ff007f;
+            cursor: pointer;
+        }
+
+        /* 復古 CRT 掃描線效果 (可疊加在圖片上) */
+        .scanlines {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanlines::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* 迷因文字效果：粗黑邊框與陰影 */
+        .meme-text-style {
+            text-transform: uppercase;
+            text-shadow: 
+                3px 3px 0 #000, -3px -3px 0 #000, 
+                3px -3px 0 #000, -3px 3px 0 #000,
+                0px 3px 0 #000,  0px -3px 0 #000,
+                3px 0px 0 #000, -3px 0px 0 #000,
+                5px 5px 10px rgba(0,0,0,0.8);
+            word-break: break-word;
+            line-height: 1.1;
+        }
+
+        /* 動態閃爍文字 */
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <!-- 頁面標題區塊 -->
+    <header class="text-center mb-8">
+        <h1 class="font-pixel text-2xl md:text-4xl text-yellow-300 tracking-wider mb-2 drop-shadow-[0_4px_0_#ff007f]">
+            <i class="fa-solid fa-gamepad mr-2"></i>RETRO MEME FACTORY
+        </h1>
+        <p class="font-vt text-xl text-cyan-300">
+            [ 復古迷因產生器 v1.0 ] <span class="blink text-pink-500">● READY</span>
+        </p>
+    </header>
+
+    <!-- 主要內容區塊：雙欄排版 (手機端自動轉單欄) -->
+    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- 左側：控制面板區 (佔 5 欄) -->
+        <section class="lg:col-span-5 retro-box p-5 md:p-6 rounded-none space-y-6">
+            <h2 class="font-pixel text-lg text-pink-400 border-b-2 border-pink-500 pb-2 flex items-center gap-2">
+                <i class="fa-solid fa-sliders"></i> 控制面板
+            </h2>
+
+            <!-- 1. 本機圖片上傳區 -->
+            <div>
+                <label class="block font-vt text-xl text-cyan-300 mb-2">
+                    <i class="fa-solid fa-upload mr-1"></i> 1. 上傳底圖 (選擇本機檔案)
+                </label>
+                <div class="relative">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                    <button onclick="document.getElementById('imageInput').click()" 
+                            class="w-full py-3 px-4 bg-purple-900 hover:bg-purple-800 text-yellow-300 border-2 border-cyan-400 flex items-center justify-center gap-2 font-vt text-xl transition-all cursor-pointer">
+                        <i class="fa-solid fa-folder-open"></i> 瀏覽電腦圖片...
+                    </button>
+                </div>
+                <!-- 預設測試圖片小按鈕 -->
+                <div class="mt-2 flex items-center gap-2">
+                    <span class="text-xs text-gray-400">快速測試範例：</span>
+                    <button onclick="loadPresetImage('doge')" class="px-2 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-500">柴犬 Doge</button>
+                    <button onclick="loadPresetImage('cat')" class="px-2 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-500">驚訝貓 Cat</button>
+                </div>
+            </div>
+
+            <!-- 2. 文字輸入區 -->
+            <div class="space-y-4">
+                <div>
+                    <label for="topTextInput" class="block font-vt text-xl text-cyan-300 mb-1">
+                        <i class="fa-solid fa-font mr-1"></i> 2. 上方文字 (Top Text)
+                    </label>
+                    <input type="text" id="topTextInput" value="當你寫的程式" placeholder="請輸入上方文字..." class="w-full p-2.5 retro-input">
+                </div>
+                <div>
+                    <label for="bottomTextInput" class="block font-vt text-xl text-cyan-300 mb-1">
+                        <i class="fa-solid fa-font mr-1"></i> 3. 下方文字 (Bottom Text)
+                    </label>
+                    <input type="text" id="bottomTextInput" value="第一次就成功執行" placeholder="請輸入下方文字..." class="w-full p-2.5 retro-input">
+                </div>
+            </div>
+
+            <!-- 3. 文字色彩與樣式選擇 -->
+            <div>
+                <label class="block font-vt text-xl text-cyan-300 mb-2">
+                    <i class="fa-solid fa-palette mr-1"></i> 4. 文字顏色
+                </label>
+                <div class="flex gap-3">
+                    <button onclick="setTextColor('#ffffff')" class="w-8 h-8 rounded-full border-2 border-white bg-white hover:scale-110 transition-transform" title="經典白"></button>
+                    <button onclick="setTextColor('#ffe600')" class="w-8 h-8 rounded-full border-2 border-white bg-yellow-400 hover:scale-110 transition-transform" title="霓虹黃"></button>
+                    <button onclick="setTextColor('#ff007f')" class="w-8 h-8 rounded-full border-2 border-white bg-pink-500 hover:scale-110 transition-transform" title="螢光粉"></button>
+                    <button onclick="setTextColor('#00f0ff')" class="w-8 h-8 rounded-full border-2 border-white bg-cyan-400 hover:scale-110 transition-transform" title="青綠色"></button>
+                </div>
+            </div>
+
+            <!-- 4. 滑桿參數控制區 -->
+            <div class="space-y-4 border-t border-purple-800 pt-4">
+                <!-- 字體大小 -->
+                <div>
+                    <div class="flex justify-between font-vt text-lg text-cyan-300 mb-1">
+                        <span><i class="fa-solid fa-text-height mr-1"></i> 字體大小</span>
+                        <span id="fontSizeVal" class="text-yellow-300">42px</span>
+                    </div>
+                    <input type="range" id="fontSizeSlider" min="20" max="80" value="42" class="w-full">
+                </div>
+
+                <!-- 上方文字垂直位置 -->
+                <div>
+                    <div class="flex justify-between font-vt text-lg text-cyan-300 mb-1">
+                        <span><i class="fa-solid fa-arrow-up-down-left-right mr-1"></i> 上方文字垂直位置</span>
+                        <span id="topPosVal" class="text-yellow-300">5%</span>
+                    </div>
+                    <input type="range" id="topPosSlider" min="0" max="40" value="5" class="w-full">
+                </div>
+
+                <!-- 下方文字垂直位置 -->
+                <div>
+                    <div class="flex justify-between font-vt text-lg text-cyan-300 mb-1">
+                        <span><i class="fa-solid fa-arrow-up-down-left-right mr-1"></i> 下方文字垂直位置</span>
+                        <span id="bottomPosVal" class="text-yellow-300">5%</span>
+                    </div>
+                    <input type="range" id="bottomPosSlider" min="0" max="40" value="5" class="w-full">
+                </div>
+            </div>
+
+            <!-- 5. 特效濾鏡 -->
+            <div class="border-t border-purple-800 pt-4">
+                <label class="block font-vt text-xl text-cyan-300 mb-2">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> 復古濾鏡效果
+                </label>
+                <select id="filterSelect" class="w-full p-2 retro-input text-base cursor-pointer">
+                    <option value="none">無濾鏡 (Normal)</option>
+                    <option value="sepia(0.8) contrast(1.2)">懷舊褐色 (Sepia Retro)</option>
+                    <option value="grayscale(1) contrast(1.5)">經典黑白 (Grayscale)</option>
+                    <option value="contrast(1.5) saturate(1.8)">高飽和爆發 (Pop Art)</option>
+                    <option value="hue-rotate(90deg) contrast(1.2)">Cyberpunk 異色</option>
+                </select>
+            </div>
+
+            <!-- 6. 一鍵下載按鈕 -->
+            <div class="pt-2">
+                <button id="downloadBtn" class="retro-btn w-full py-4 text-base md:text-lg flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-download text-xl"></i> 一鍵下載迷因 (.PNG)
+                </button>
+            </div>
+        </section>
+
+        <!-- 右側：迷因即時預覽區 (佔 7 欄，設定 lg:sticky 方便滾動時保持可見) -->
+        <section class="lg:col-span-7 lg:sticky lg:top-8">
+            <div class="retro-box p-4 md:p-6">
+                <h2 class="font-pixel text-lg text-yellow-300 border-b-2 border-yellow-400 pb-2 mb-4 flex items-center justify-between">
+                    <span><i class="fa-solid fa-desktop"></i> 即時預覽 (PREVIEW)</span>
+                    <span class="text-xs font-vt text-pink-400">CRT 80s MODE</span>
+                </h2>
+
+                <!-- 迷因圖片核心容器 (截圖目標區域) -->
+                <div id="memeContainer" class="relative w-full overflow-hidden bg-black flex items-center justify-center min-h-[300px] border-2 border-cyan-400 scanlines">
+                    
+                    <!-- 底圖 -->
+                    <img id="memeImage" class="w-full h-auto object-contain max-h-[600px] transition-all" src="" alt="Meme Preview">
+
+                    <!-- 上方文字區塊 -->
+                    <div id="topTextDisplay" 
+                         class="absolute w-full px-4 text-center font-meme text-white meme-text-style pointer-events-none select-none" 
+                         style="top: 5%;">
+                        當你寫的程式
+                    </div>
+
+                    <!-- 下方文字區塊 -->
+                    <div id="bottomTextDisplay" 
+                         class="absolute w-full px-4 text-center font-meme text-white meme-text-style pointer-events-none select-none" 
+                         style="bottom: 5%;">
+                        第一次就成功執行
+                    </div>
+
+                </div>
+
+                <!-- 底部提示文字 -->
+                <p class="text-center font-vt text-base text-gray-400 mt-4">
+                    <i class="fa-solid fa-circle-info"></i> 所有圖片處理皆在您的瀏覽器本機端完成，不會上傳至任何伺服器。
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript 邏輯控制 -->
+    <script>
+        // ==========================================
+        // 1. DOM 元素選取 (取得頁面上的控制元件)
+        // ==========================================
+        const imageInput = document.getElementById('imageInput');
+        const memeImage = document.getElementById('memeImage');
+        const topTextInput = document.getElementById('topTextInput');
+        const bottomTextInput = document.getElementById('bottomTextInput');
+        const topTextDisplay = document.getElementById('topTextDisplay');
+        const bottomTextDisplay = document.getElementById('bottomTextDisplay');
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const fontSizeVal = document.getElementById('fontSizeVal');
+        const topPosSlider = document.getElementById('topPosSlider');
+        const topPosVal = document.getElementById('topPosVal');
+        const bottomPosSlider = document.getElementById('bottomPosSlider');
+        const bottomPosVal = document.getElementById('bottomPosVal');
+        const filterSelect = document.getElementById('filterSelect');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const memeContainer = document.getElementById('memeContainer');
+
+        // 當前文字顏色變數
+        let currentTextColor = '#ffffff';
+
+        // ==========================================
+        // 2. 初始化與預設圖片載入
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // 初始化載入柴犬預設圖
+            loadPresetImage('doge');
+            updateTextStyles();
+        });
+
+        // 載入 SVG 產生的範例底圖 (無需外部網路圖檔，避免圖片失效)
+        function loadPresetImage(type) {
+            let svgString = '';
+            if (type === 'doge') {
+                svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="500" viewBox="0 0 600 500"><rect width="600" height="500" fill="#f4c430"/><circle cx="300" cy="250" r="180" fill="#e6b800"/><circle cx="230" cy="200" r="25" fill="#333"/><circle cx="370" cy="200" r="25" fill="#333"/><circle cx="238" cy="190" r="8" fill="#fff"/><circle cx="378" cy="190" r="8" fill="#fff"/><ellipse cx="300" cy="260" rx="40" ry="30" fill="#333"/><path d="M 230 320 Q 300 370 370 320" stroke="#333" stroke-width="12" stroke-linecap="round" fill="none"/><text x="50%" y="90%" font-family="monospace" font-size="28" fill="#111" text-anchor="middle" font-weight="bold">[ RETRO DOGE CANVAS ]</text></svg>`;
+            } else {
+                svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="500" viewBox="0 0 600 500"><rect width="600" height="500" fill="#ff007f"/><circle cx="300" cy="220" r="150" fill="#ffe600"/><polygon points="180,100 230,170 150,160" fill="#ffe600"/><polygon points="420,100 370,170 450,160" fill="#ffe600"/><circle cx="240" cy="200" r="20" fill="#0d0221"/><circle cx="360" cy="200" r="20" fill="#0d0221"/><ellipse cx="300" cy="270" rx="35" ry="45" fill="#0d0221"/><text x="50%" y="90%" font-family="monospace" font-size="28" fill="#fff" text-anchor="middle" font-weight="bold">[ SURPRISED CAT CANVAS ]</text></svg>`;
+            }
+            // 將 SVG 轉為 Base64 Data URL 給 <img> 使用
+            memeImage.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+        }
+
+        // ==========================================
+        // 3. FileReader 本機圖片讀取 (核心避雷功能)
+        // ==========================================
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // 檢查是否為圖片檔
+                if (!file.type.startsWith('image/')) {
+                    alert('請選擇有效的圖片檔案！');
+                    return;
+                }
+                
+                // 使用 FileReader 讀取本機圖檔轉換成 DataURL (避免跨網域 CORS 問題)
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    memeImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // ==========================================
+        // 4. 即時文字與控制參數監聽器
+        // ==========================================
+        
+        // 上下文字即時更新
+        topTextInput.addEventListener('input', () => {
+            topTextDisplay.textContent = topTextInput.value;
+        });
+        bottomTextInput.addEventListener('input', () => {
+            bottomTextDisplay.textContent = bottomTextInput.value;
+        });
+
+        // 滑桿控制 (字體大小、垂直位置)
+        fontSizeSlider.addEventListener('input', updateTextStyles);
+        topPosSlider.addEventListener('input', updateTextStyles);
+        bottomPosSlider.addEventListener('input', updateTextStyles);
+
+        function updateTextStyles() {
+            const size = fontSizeSlider.value;
+            const topPos = topPosSlider.value;
+            const bottomPos = bottomPosSlider.value;
+
+            // 更新顯示數據數值
+            fontSizeVal.textContent = `${size}px`;
+            topPosVal.textContent = `${topPos}%`;
+            bottomPosVal.textContent = `${bottomPos}%`;
+
+            // 套用至預覽元素
+            topTextDisplay.style.fontSize = `${size}px`;
+            bottomTextDisplay.style.fontSize = `${size}px`;
+
+            topTextDisplay.style.top = `${topPos}%`;
+            bottomTextDisplay.style.bottom = `${bottomPos}%`;
+        }
+
+        // 切換文字顏色
+        function setTextColor(color) {
+            currentTextColor = color;
+            topTextDisplay.style.color = color;
+            bottomTextDisplay.style.color = color;
+        }
+
+        // 濾鏡切換
+        filterSelect.addEventListener('change', () => {
+            memeImage.style.filter = filterSelect.value;
+        });
+
+        // ==========================================
+        // 5. 一鍵截圖下載 (html2canvas)
+        // ==========================================
+        downloadBtn.addEventListener('click', () => {
+            // 變更按鈕狀態
+            const originalBtnText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xl"></i> 產生中...`;
+            downloadBtn.disabled = true;
+
+            // 使用 html2canvas 截取整個 #memeContainer 區域
+            html2canvas(memeContainer, {
+                scale: 2, // 提高解析度畫質 (2x)
+                useCORS: true, // 允許跨域圖片 (雖然我們已使用 Base64/Local File)
+                backgroundColor: null, // 保持透明背景
+                logging: false
+            }).then(canvas => {
+                // 將 Canvas 轉換為圖片 Data URL
+                const imageUrl = canvas.toDataURL('image/png');
+
+                // 建立隱藏的 <a> 標籤觸發下載
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageUrl;
+                downloadLink.download = 'my-retro-meme.png'; // 下載檔名
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                // 恢復按鈕狀態
+                downloadBtn.innerHTML = originalBtnText;
+                downloadBtn.disabled = false;
+            }).catch(err => {
+                console.error('截圖失敗：', err);
+                alert('圖片產生失敗，請稍後再試！');
+                downloadBtn.innerHTML = originalBtnText;
+                downloadBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
