@@ -243,26 +243,71 @@
                     </button>
                 </div>
 
-                <!-- Question Input & Quick Presets -->
+                <!-- Current Active Question Status Card (For Host Management) -->
+                <div id="hostCurrentQuestionCard" class="hidden p-3.5 rounded-xl bg-morandi-blue/10 border border-morandi-blue/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div class="space-y-0.5 min-w-0">
+                        <div class="text-[11px] font-semibold text-morandi-blue-dark flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-morandi-blue animate-pulse"></span>
+                            <span>目前已發布題目（開牌前可隨時修改或清空）</span>
+                        </div>
+                        <p id="hostCurrentQuestionText" class="text-xs sm:text-sm font-medium text-notion-text truncate"></p>
+                    </div>
+                    <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+                        <button type="button" onclick="editCurrentQuestion()"
+                            class="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-white hover:bg-notion-hover text-notion-text border border-notion-border transition-colors">
+                            帶入修改
+                        </button>
+                        <button type="button" onclick="handleResetRoom()"
+                            class="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-white hover:bg-morandi-terracotta/10 text-morandi-terracotta-dark border border-notion-border transition-colors">
+                            清除題目
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Input, Character Counter & Quick Actions -->
                 <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label for="inputHostQuestion" class="text-xs font-medium text-notion-text">
+                            設定本回合心電感應題目
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="pickRandomQuestion()"
+                                class="text-[11px] font-medium text-morandi-blue hover:text-morandi-blue-dark flex items-center gap-1 transition-colors">
+                                <span>🎲</span>
+                                <span>隨機抽一題</span>
+                            </button>
+                            <span class="text-notion-border">|</span>
+                            <span id="hostQuestionCharCount" class="text-[11px] font-mono text-notion-muted">0 / 60</span>
+                        </div>
+                    </div>
+
                     <div class="flex flex-col sm:flex-row gap-2.5">
-                        <input id="inputHostQuestion" type="text" placeholder="輸入本回合心電感應題目..."
-                            onkeydown="if(event.key==='Enter') handleSetQuestion()"
-                            class="flex-1 px-3.5 py-2.5 text-sm bg-notion-bg/60 border border-notion-border rounded-xl text-notion-text focus:outline-none focus:bg-white focus:border-morandi-blue transition-all">
+                        <div class="relative flex-1">
+                            <input id="inputHostQuestion" type="text" maxlength="60" placeholder="輸入題目，或點擊下方靈感題庫快速帶入..."
+                                oninput="updateHostQuestionCounter()"
+                                onkeydown="if(event.key==='Enter') handleSetQuestion()"
+                                class="w-full pl-3.5 pr-8 py-2.5 text-sm bg-notion-bg/60 border border-notion-border rounded-xl text-notion-text focus:outline-none focus:bg-white focus:border-morandi-blue focus:ring-2 focus:ring-morandi-blue/20 transition-all">
+                            <button type="button" id="btnClearQuestionInput" onclick="clearHostQuestionInput()"
+                                class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-notion-muted hover:text-notion-text text-xs p-1"
+                                title="清空輸入框">
+                                ✕
+                            </button>
+                        </div>
                         <button type="button" id="btnSetQuestion" onclick="handleSetQuestion()"
-                            class="px-4 py-2.5 bg-morandi-blue hover:bg-morandi-blue-dark text-white text-xs sm:text-sm font-medium rounded-xl transition-colors whitespace-nowrap shadow-sm">
-                            發布題目 (開始作答)
+                            class="px-4 py-2.5 bg-morandi-blue hover:bg-morandi-blue-dark text-white text-xs sm:text-sm font-medium rounded-xl transition-colors whitespace-nowrap shadow-sm flex items-center justify-center gap-1.5">
+                            <span>發布題目 (開始作答)</span>
                         </button>
                     </div>
 
                     <!-- Built-in Fun Preset Prompts -->
-                    <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
-                        <span class="text-[11px] text-notion-muted mr-1">靈感題庫：</span>
+                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                        <span class="text-[11px] text-notion-muted mr-0.5">靈感題庫：</span>
+                        <button type="button" onclick="fillPresetQuestion('如果你有一百萬，第一件想買什麼？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">💰 一百萬買什麼</button>
+                        <button type="button" onclick="fillPresetQuestion('週末最想去哪裡度假？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">🏖️ 週末度假</button>
+                        <button type="button" onclick="fillPresetQuestion('如果能擁有超能力，你希望是什麼？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">⚡ 希望的超能力</button>
+                        <button type="button" onclick="fillPresetQuestion('團隊中最常遲到的是誰？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">⏰ 最常遲到的人</button>
                         <button type="button" onclick="fillPresetQuestion('台灣夜市最經典的小吃是什麼？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">🍢 夜市小吃</button>
                         <button type="button" onclick="fillPresetQuestion('去超商最常買的飲料？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">🥤 超商飲料</button>
-                        <button type="button" onclick="fillPresetQuestion('出國旅遊首選哪一個國家？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">✈️ 出國首選</button>
-                        <button type="button" onclick="fillPresetQuestion('一種紅色的水果？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">🍎 紅色水果</button>
-                        <button type="button" onclick="fillPresetQuestion('星期一早上最想說的一句話？')" class="text-[11px] px-2.5 py-1 rounded-lg bg-notion-bg hover:bg-morandi-sand-light text-notion-text border border-notion-border transition-colors">🥱 週一心聲</button>
                     </div>
                 </div>
 
@@ -361,48 +406,99 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between text-xs text-notion-muted">
             <span>雲端心電感應 · Notion Morandi Edition</span>
             <button type="button" onclick="toggleHostConsole()"
-                class="opacity-35 hover:opacity-100 focus:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-notion-hover flex items-center gap-1.5 text-notion-muted hover:text-notion-text"
-                title="切換房主控制台 (快捷鍵 Alt + H)">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                </svg>
-                <span class="text-[11px]">房主</span>
+                class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-notion-hover text-notion-muted hover:text-notion-text transition-colors"
+                title="隱藏房主控制台開關 (Alt + H)">
+                <span>🗝️</span>
+                <span class="hidden sm:inline">房主控制台</span>
             </button>
         </div>
     </footer>
 
-    <!-- Minimalist Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-notion-text text-white text-xs sm:text-sm shadow-lg transition-all duration-300 opacity-0 translate-y-2 pointer-events-none flex items-center gap-2">
-        <span id="toastDot" class="w-2 h-2 rounded-full bg-morandi-sage"></span>
-        <span id="toastText">提示訊息</span>
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300">
+        <div class="bg-notion-text text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2">
+            <span id="toastDot" class="w-2 h-2 rounded-full bg-morandi-sage"></span>
+            <span id="toastText">提示訊息</span>
+        </div>
     </div>
 
     <script>
         // ==========================================
-        // 1. GAS API Configuration Constants
+        // 1. GAS API Configuration & Global State
         // ==========================================
         const SHEET_NAME = 'TelepathyData';
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw5sxrqsjVmziYtGvi28H1Jb2J3GdWSb8uFxj_wc7nxDLqyoUtWeGO5H_9FA89d5TF6/exec";
-        const POLL_INTERVAL_MS = 2500;
+        const POLL_INTERVAL_MS = 2000;
 
-        // ==========================================
-        // 2. Centralized Application State
-        // ==========================================
         const appState = {
-            playerName: '',
             room: '',
-            isHostOpen: false,
-            isDemoMode: false,
+            playerName: '',
             status: 'setup', // 'setup' | 'playing' | 'revealed'
             question: '',
             answers: {},
+            isHostOpen: false,
+            isDemoMode: false,
             pollTimer: null,
             pollPausedUntil: 0,
             isPosting: false
         };
 
         // ==========================================
-        // 3. Initialization & Keyboard Shortcuts
+        // 2. Host Preset Questions & Input Helpers
+        // ==========================================
+        const PRESET_QUESTIONS = [
+            '如果你有一百萬，第一件想買什麼？',
+            '週末最想去哪裡度假？',
+            '如果能擁有超能力，你希望是什麼？',
+            '團隊中最常遲到的是誰？',
+            '台灣夜市最經典的小吃是什麼？',
+            '去超商最常買的飲料？',
+            '出國旅遊首選哪一個國家？',
+            '一種紅色的水果？',
+            '星期一早上最想說的一句話？',
+            '世界末日來臨前最後一餐想吃什麼？'
+        ];
+
+        function updateHostQuestionCounter() {
+            const input = document.getElementById('inputHostQuestion');
+            const counter = document.getElementById('hostQuestionCharCount');
+            const clearBtn = document.getElementById('btnClearQuestionInput');
+            const len = input.value.length;
+            counter.textContent = `${len} / 60`;
+            counter.classList.toggle('text-morandi-terracotta-dark', len >= 55);
+            clearBtn.classList.toggle('hidden', len === 0);
+        }
+
+        function fillPresetQuestion(text) {
+            const input = document.getElementById('inputHostQuestion');
+            input.value = text;
+            updateHostQuestionCounter();
+            input.focus();
+        }
+
+        function pickRandomQuestion() {
+            const input = document.getElementById('inputHostQuestion');
+            const candidates = PRESET_QUESTIONS.filter((q) => q !== input.value.trim());
+            const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+            fillPresetQuestion(chosen);
+            showToast('已為您隨機挑選一題！', 'blue');
+        }
+
+        function clearHostQuestionInput() {
+            const input = document.getElementById('inputHostQuestion');
+            input.value = '';
+            updateHostQuestionCounter();
+            input.focus();
+        }
+
+        function editCurrentQuestion() {
+            if (!appState.question) return;
+            fillPresetQuestion(appState.question);
+            showToast('已將目前題目帶入輸入框，修改後點擊發布即可更新', 'blue');
+        }
+
+        // ==========================================
+        // 3. Initialization & Room Navigation
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
@@ -532,13 +628,6 @@
                 panel.classList.add('hidden');
                 if (!silent) showToast('已收合房主控制台', 'blue');
             }
-        }
-
-        // Preset Question Helper
-        function fillPresetQuestion(text) {
-            const input = document.getElementById('inputHostQuestion');
-            input.value = text;
-            input.focus();
         }
 
         // ==========================================
@@ -750,8 +839,9 @@
 
             if (ok) {
                 input.value = '';
+                updateHostQuestionCounter();
                 document.getElementById('inputPlayerAnswer').value = '';
-                showToast('題目已發布！全體進入作答階段', 'sage');
+                showToast('✓ 題目已成功發布！全體進入作答階段', 'sage');
             }
         }
 
@@ -832,6 +922,16 @@
             // Update counters
             document.getElementById('hostAnswerCount').textContent = totalPlayers;
             document.getElementById('gridAnswerCount').textContent = totalPlayers;
+
+            // Update Host Active Question Management Card
+            const hostCurrentCard = document.getElementById('hostCurrentQuestionCard');
+            const hostCurrentText = document.getElementById('hostCurrentQuestionText');
+            if ((status === 'playing' || status === 'revealed') && question) {
+                hostCurrentCard.classList.remove('hidden');
+                hostCurrentText.textContent = question;
+            } else {
+                hostCurrentCard.classList.add('hidden');
+            }
 
             // Stage UI Elements
             const stageBadge = document.getElementById('stageBadge');
